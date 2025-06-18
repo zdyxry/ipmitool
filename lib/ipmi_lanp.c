@@ -1,21 +1,21 @@
 /*
  * Copyright (c) 2003 Sun Microsystems, Inc.  All Rights Reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
- * 
+ *
  * Redistribution of source code must retain the above copyright
  * notice, this list of conditions and the following disclaimer.
- * 
+ *
  * Redistribution in binary form must reproduce the above copyright
  * notice, this list of conditions and the following disclaimer in the
  * documentation and/or other materials provided with the distribution.
- * 
+ *
  * Neither the name of Sun Microsystems, Inc. or the names of
  * contributors may be used to endorse or promote products derived
  * from this software without specific prior written permission.
- * 
+ *
  * This software is provided "AS IS," without a warranty of any kind.
  * ALL EXPRESS OR IMPLIED CONDITIONS, REPRESENTATIONS AND WARRANTIES,
  * INCLUDING ANY IMPLIED WARRANTY OF MERCHANTABILITY, FITNESS FOR A
@@ -228,16 +228,28 @@ get_lan_param_select(struct ipmi_intf *intf, uint8_t chan, int param, int select
 	switch (rsp->ccode)
 	{
 	case 0x00: /* successful */
+		p->data = rsp->data + 1;
+		p->data_len = rsp->data_len - 1;
+		rc = p;
 		break;
 
 	case 0x80: /* parameter not supported */
-	case 0xc9: /* parameter out of range */
-	case 0xcc: /* invalid data field in request */
+		lprintf(LOG_DEBUG, "Parameter '%s' not supported", p->desc);
 		/* We treat them as valid but empty response */
 		p->data = NULL;
 		p->data_len = 0;
 		rc = p;
-		/* fall through */
+		break;
+
+	case 0xc9: /* parameter out of range */
+	case 0xcc: /* invalid data field in request */
+		lprintf(LOG_DEBUG, "Parameter '%s' out of range or invalid", p->desc);
+		/* We treat them as valid but empty response */
+		p->data = NULL;
+		p->data_len = 0;
+		rc = p;
+		break;
+
 	default:
 		/* other completion codes are treated as error */
 		lprintf(LOG_INFO, "Get LAN Parameter '%s' command failed: %s",
@@ -245,13 +257,10 @@ get_lan_param_select(struct ipmi_intf *intf, uint8_t chan, int param, int select
 			specific_val2str(rsp->ccode,
 			                 get_lan_cc_vals,
 			                 completion_code_vals));
-		return NULL;
+		break;
 	}
 
-	p->data = rsp->data + 1;
-	p->data_len = rsp->data_len - 1;
-
-	return p;
+	return rc;
 }
 
 /* get_lan_param - Query BMC for LAN parameter data
@@ -1009,7 +1018,7 @@ ipmi_lan_set_password(struct ipmi_intf *intf,
  *
  * @channel - IPMI channel
  * @enable - whether to enable/disable PEF alerting for given channel
- * 
+ *
  * returns - 0 on success, (-1) on error.
  */
 static int
@@ -1405,7 +1414,7 @@ ipmi_lan_set(struct ipmi_intf *intf, int argc, char **argv)
 		print_lan_set_usage();
 		return 0;
 	}
-	
+
 	if (str2uchar(argv[0], &chan) != 0) {
 		lprintf(LOG_ERR, "Invalid channel: %s", argv[0]);
 		return (-1);
@@ -2506,7 +2515,7 @@ ipmi_lanp_main(struct ipmi_intf *intf, int argc, char **argv)
 	}
 
 	if (!strcmp(argv[0], "printconf")
-	    || !strcmp(argv[0], "print")) 
+	    || !strcmp(argv[0], "print"))
 	{
 		if (argc > 2) {
 			print_lan_usage();
