@@ -4,7 +4,7 @@
 Name:         ipmitool
 Summary:      Utility for IPMI control
 Version:      1.8.19
-Release:      7%{?dist}
+Release:      8%{?dist}
 License:      BSD-3-Clause-No-Nuclear-Warranty
 URL:          http://ipmitool.sourceforge.net/
 Source0:      https://github.com/%{name}/%{name}/archive/%{gitname}_%{gitversion}/%{name}-%{version}.tar.gz
@@ -192,6 +192,9 @@ install -Dm 755 contrib/bmc-snmp-proxy         %{buildroot}%{_libexecdir}/bmc-sn
 %{_libexecdir}/bmc-snmp-proxy
 
 %changelog
+* Thu Jun 19 2025 dev<dev@smartx.com> - 1.8.19-8
+- Fix lan print
+
 * Mon Feb 12 2024 Pavel Cahyna <pcahyna@redhat.com> - 1.8.19-7
 - Update IANA numbers
 - Apply patch from CentOS Stream, never applied upstream:
@@ -279,7 +282,7 @@ install -Dm 755 contrib/bmc-snmp-proxy         %{buildroot}%{_libexecdir}/bmc-sn
 - Fix DDR4 memory issues
 - Increase length of sensor id
 - Enable usb interface by default
-- Fix input options 
+- Fix input options
 
 * Wed Feb 07 2018 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.18-9
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild
@@ -453,7 +456,7 @@ install -Dm 755 contrib/bmc-snmp-proxy         %{buildroot}%{_libexecdir}/bmc-sn
 
 * Tue Oct 14 2008 Jan Safranek <jsafrane@redhat.com> 1.8.10-2
 - fix issues found during package review:
-  - clear Default-Start: line in the init script, the service should be 
+  - clear Default-Start: line in the init script, the service should be
     disabled by default
   - added Obsoletes: OpenIPMI-tools
   - compile with --disable-dependency-tracking to speed things up
