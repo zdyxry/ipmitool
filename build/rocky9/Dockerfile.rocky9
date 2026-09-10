@@ -1,0 +1,17 @@
+FROM rockylinux:9 AS builder
+
+RUN dnf -y install dnf-plugins-core \
+    && dnf config-manager --set-enabled crb \
+    && dnf -y install rpm-build \
+    && mkdir -p /root/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
+
+COPY ./SOURCES/* /root/rpmbuild/SOURCES/
+COPY ./SPECS/* /root/rpmbuild/SPECS/
+COPY ./ipmitool-1.8.19.tar.gz /root/rpmbuild/SOURCES/
+
+RUN dnf -y builddep /root/rpmbuild/SPECS/ipmitool.spec
+
+RUN dnf -y install make
+
+RUN rpmbuild -ba -v \
+    /root/rpmbuild/SPECS/ipmitool.spec --nocheck
